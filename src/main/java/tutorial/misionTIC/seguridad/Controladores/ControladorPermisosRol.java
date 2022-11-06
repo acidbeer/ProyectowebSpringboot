@@ -29,10 +29,11 @@ public class ControladorPermisosRol {
 
     @GetMapping
     public List<PermisosRol> buscarTodosLosPermisosRoles(){
-        log.info("Buscando todos los permisos roles en bas e de datos");
+        log.info("Buscando todos los permisos roles en la base de datos....");
         return miRepositoriopermisosRol.findAll();
     }
 
+    //Relacion de muchos a muchos
     @PostMapping("rol/{idRol}/permiso/{idPermiso}")
     public PermisosRol crearpermisosRol(@PathVariable String idRol, @PathVariable String idPermiso) {
 
