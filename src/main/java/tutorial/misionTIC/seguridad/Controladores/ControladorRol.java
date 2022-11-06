@@ -51,6 +51,7 @@ public class ControladorRol {
         return mirepositorioRol.save(infoRol);
     }
 
+
     @PutMapping("{idRol}")
     public Rol modificarRol(@PathVariable String idRol,@RequestBody Rol infoRol){
         log.info("modificando el rol: {}", idRol);

@@ -1,10 +1,12 @@
 package tutorial.misionTIC.seguridad.Controladores;
 
 import lombok.extern.slf4j.Slf4j;
+import tutorial.misionTIC.seguridad.modelos.Rol;
 import tutorial.misionTIC.seguridad.modelos.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import tutorial.misionTIC.seguridad.repositorios.RepositorioRol;
 import tutorial.misionTIC.seguridad.repositorios.RepositorioUsuario;
 
 import java.security.MessageDigest;
@@ -19,6 +21,9 @@ public class ControladorUsuario {
 
     @Autowired
     private RepositorioUsuario miRepositorioUsuario;
+
+    @Autowired
+    RepositorioRol miRepositorioRol;
 
     @GetMapping
     public List<Usuario> buscarTodoslosUsusarios(){
@@ -72,6 +77,22 @@ public class ControladorUsuario {
         }else{
             return null;
         }
+
+    }
+
+    //asociacion de uno a muchos
+    @PutMapping("{idUsuario}/rol/{idRol}")
+    public Usuario asignarRolAlUsuario(@PathVariable String idUsuario, @PathVariable String idRol){
+        Usuario usuario= miRepositorioUsuario.findById(idUsuario).orElse(null);
+        Rol rol= miRepositorioRol.findById(idRol).orElse(null);
+
+        if(usuario != null && rol != null) {
+            usuario.setRol(rol);
+            return miRepositorioUsuario.save(usuario);
+        }else{
+            return null;
+        }
+
 
     }
 
