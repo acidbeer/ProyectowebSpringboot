@@ -10,7 +10,10 @@ import tutorial.misionTIC.seguridad.repositorios.RepositorioPermiso;
 import tutorial.misionTIC.seguridad.repositorios.RepositorioPermisosRol;
 import tutorial.misionTIC.seguridad.repositorios.RepositorioRol;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
+
 
 @Slf4j
 @CrossOrigin
@@ -27,38 +30,37 @@ public class ControladorPermisosRol {
     @Autowired
     private RepositorioPermiso mirepositorioPermiso;
 
-    @GetMapping
+    @GetMapping("/listar-permisos")
     public List<PermisosRol> buscarTodosLosPermisosRoles(){
         log.info("Buscando todos los permisos roles en la base de datos....");
         return miRepositoriopermisosRol.findAll();
     }
 
+
+
+
+
+
     //Relacion de muchos a muchos
     @PostMapping("rol/{idRol}/permiso/{idPermiso}")
-    public PermisosRol crearpermisosRol(@PathVariable String idRol, @PathVariable String idPermiso) {
+    public PermisosRol crearPermisosRol(@PathVariable String idRol, @PathVariable String idPermiso) {
+        Rol rol = miRepositorioRol
+                .findById(idRol)
+                .orElseThrow(RuntimeException::new);
 
-        PermisosRol nuevo=new PermisosRol();
-        Rol elRol=this.miRepositorioRol.findById(idRol).get();
-        Permiso elPermiso=this.mirepositorioPermiso.findById(idPermiso).get();
+        Permiso permiso = mirepositorioPermiso
+                .findById(idPermiso)
+                .orElseThrow(RuntimeException::new);
 
-        if(elRol != null && elPermiso != null){
-            nuevo.setPermiso(elPermiso);
-            nuevo.setRol(elRol);
-            return this.miRepositoriopermisosRol.save(nuevo);
-        }else{
-            return null;
-        }
+        PermisosRol permisosRol = new PermisosRol(rol, permiso);
 
+        return miRepositoriopermisosRol.save(permisosRol);
     }
 
-    @GetMapping("{idPermisosRol}")
-    public PermisosRol show(@PathVariable String idPermisosRol){
-        PermisosRol permisosRolActual= this.miRepositoriopermisosRol
-                .findById(idPermisosRol)
-                .orElse(null);
-        return permisosRolActual;
-    }
 
+
+
+    /*
     @PutMapping("{idPermisos_rol}/rol/{idRol}/permiso/{idPermiso}")
     public PermisosRol modificarPermisosRol(@PathVariable String idPermisos_rol, @PathVariable String idRol,
     @PathVariable String idPermiso){
@@ -86,6 +88,39 @@ public class ControladorPermisosRol {
         if(permisoRolActual != null){
             this.miRepositoriopermisosRol.delete(permisoRolActual);
 
+        }
+
+    }*/
+
+    @GetMapping("validar-permiso/rol/{idRol}")
+    public PermisosRol validarPermisosDelRol(@PathVariable String idRol, @RequestBody Permiso infoPermiso,HttpServletResponse response) throws IOException {
+
+        //Buscar en base de datos el rol y permiso
+        Rol rolActual = miRepositorioRol.findById(idRol).orElse(null);
+        Permiso permisoActual =mirepositorioPermiso.findByurlAndMethod(infoPermiso.getUrl(), infoPermiso.getMetodo());
+
+        //Validar si existe el rol y el permiso en base de datos
+        if (rolActual != null && permisoActual != null) {
+
+            String idRolActual = rolActual.get_id();
+            String idPermisoActual = permisoActual.get_id();
+            log.info("idRolActual: {}, idPermisoActual: {}", idRolActual, idPermisoActual);
+
+            //Buscar en la tabla PermisosRol si el rol tiene asociado el permiso.
+            PermisosRol permisosRolActual = miRepositoriopermisosRol.findByRolAndPermiso(idRolActual,idPermisoActual);
+            log.info("El permisosRol que encontró en BD fue: {}", permisosRolActual);
+
+            if (permisosRolActual != null) {
+                return permisosRolActual;
+            } else {
+                log.error("NO se encuentra el PermisosRol en base de datos");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return null;
+            }
+        } else {
+            log.error("NO se encuentra el rol o el permiso en base de datos");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return null;
         }
 
     }

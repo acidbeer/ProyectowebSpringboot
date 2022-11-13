@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import tutorial.misionTIC.seguridad.repositorios.RepositorioRol;
 import tutorial.misionTIC.seguridad.repositorios.RepositorioUsuario;
 
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -92,6 +95,38 @@ public class ControladorUsuario {
         }else{
             return null;
         }
+
+
+    }
+
+    @PostMapping("/validar-usuario")
+    public Usuario validarCorreoYContraseña(@RequestBody Usuario infoUsuario, HttpServletResponse response) throws IOException {
+        log.info("Usuario que llega desde postman: {}", infoUsuario);
+
+        //Buscar el usuario en base de datos por correo
+        Usuario usuarioActual = miRepositorioUsuario.findByEmail(infoUsuario.getCorreo());
+        log.info("Usuario encontrado en base de datos : {}", usuarioActual);
+
+        //validar si el usuario fue encontrado
+        if(usuarioActual != null){
+            //validar la contraseña
+            String contrasenaUsuario= convertirSHA256( infoUsuario.getContrasena());
+            String contrasenaBaseDeDatos= usuarioActual.getContrasena();
+
+            if(contrasenaUsuario.equals(contrasenaBaseDeDatos)){
+                usuarioActual.setContrasena("");
+                return usuarioActual;
+
+            }else{
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return null;
+            }
+
+       }else{
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return null;
+        }
+
 
 
     }
