@@ -26,9 +26,4 @@ public class PermisosRol {
         this.permiso = permiso;
     }
 
-
-
-
-
-
 }

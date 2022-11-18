@@ -6,8 +6,8 @@ import tutorial.misionTIC.seguridad.modelos.PermisosRol;
 
 public interface RepositorioPermisosRol  extends MongoRepository<PermisosRol, String> {
 
-    @Query("{'rol.$_id': ObjectId(?0), 'permiso.$_id': ObjectId(?1)}")
-    PermisosRol findByRolAndPermiso(String idRol, String idPermiso);
+    @Query("{'rol.$id': ObjectId(?0), 'permiso.$id': ObjectId(?1)}")
+    public PermisosRol findByRolAndPermiso(String idRol, String idPermiso);
 
 
 }
