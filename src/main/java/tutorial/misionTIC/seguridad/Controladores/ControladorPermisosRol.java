@@ -60,37 +60,7 @@ public class ControladorPermisosRol {
 
 
 
-    /*
-    @PutMapping("{idPermisos_rol}/rol/{idRol}/permiso/{idPermiso}")
-    public PermisosRol modificarPermisosRol(@PathVariable String idPermisos_rol, @PathVariable String idRol,
-    @PathVariable String idPermiso){
-        PermisosRol permisoRolActual= this.miRepositoriopermisosRol.findById(idPermisos_rol).orElse(null);
-        Rol elRol=this.miRepositorioRol.findById(idRol).get();
-        Permiso elPermiso=this.mirepositorioPermiso.findById(idPermiso).get();
 
-        if(permisoRolActual != null && elPermiso != null && elRol != null){
-            permisoRolActual.setPermiso(elPermiso);
-            permisoRolActual.setRol(elRol);
-
-            return this.miRepositoriopermisosRol.save(permisoRolActual);
-        }else{
-            return null;
-        }
-
-
-    }
-
-
-    @DeleteMapping("{idPermisos_rol}")
-    public void eliminar(@PathVariable String idPermisos_rol){
-        PermisosRol permisoRolActual=this.miRepositoriopermisosRol.findById(idPermisos_rol).orElse(null);
-
-        if(permisoRolActual != null){
-            this.miRepositoriopermisosRol.delete(permisoRolActual);
-
-        }
-
-    }*/
 
     @GetMapping("validar-permiso/rol/{idRol}")
     public PermisosRol validarPermisosDelRol(@PathVariable String idRol, @RequestBody Permiso infoPermiso,HttpServletResponse response) throws IOException {
